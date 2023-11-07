@@ -49,9 +49,7 @@ public class SUPickerFragment extends FilePickerFragment {
     private boolean hasSUPermission() {
         if (isSUAvailable()) {
             List<String> result = Shell.cmd("ls -l /").exec().getOut();
-            if (!result.isEmpty()) {
-                return true;
-            }
+            return !result.isEmpty();
         }
         return false;
     }

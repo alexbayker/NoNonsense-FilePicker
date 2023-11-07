@@ -7,11 +7,13 @@
 package com.nononsenseapps.filepicker.sample;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
+import android.provider.Settings;
+
 import androidx.core.content.ContextCompat;
 
 import java.io.File;
@@ -23,6 +25,8 @@ import static org.junit.Assert.assertTrue;
 
 
 public class NoNonsenseFilePickerTest extends NoNonsenseFilePicker {
+
+    public static final int REQUEST_PERMISSION_EXTERNAL_STORAGE = 3;
 
     @Override
     protected void onResume() {
@@ -68,25 +72,26 @@ public class NoNonsenseFilePickerTest extends NoNonsenseFilePicker {
     }
 
     protected boolean hasPermission() {
-        return PackageManager.PERMISSION_GRANTED ==
-                ContextCompat.checkSelfPermission(this,
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) ||
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED &&
+                 ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
     }
 
     protected void requestPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                            Uri.parse("package:" + BuildConfig.APPLICATION_ID));
+                    startActivityForResult(intent, REQUEST_PERMISSION_EXTERNAL_STORAGE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    startActivityForResult(intent, REQUEST_PERMISSION_EXTERNAL_STORAGE);
+                }
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_PERMISSION_EXTERNAL_STORAGE);
         }
     }
-
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    try {
-                        createTestData();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
 }

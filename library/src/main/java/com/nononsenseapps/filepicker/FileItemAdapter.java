@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.SortedList;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.annotation.SuppressLint;
 import android.view.ViewGroup;
 
 /**
@@ -25,6 +27,7 @@ public class FileItemAdapter<T> extends RecyclerView.Adapter<RecyclerView.ViewHo
         this.mLogic = logic;
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void setList(@Nullable SortedList<T> list) {
         mList = list;
         notifyDataSetChanged();

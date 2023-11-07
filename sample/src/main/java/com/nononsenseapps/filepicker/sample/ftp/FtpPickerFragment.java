@@ -6,6 +6,7 @@
 
 package com.nononsenseapps.filepicker.sample.ftp;
 
+import android.annotation.SuppressLint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -200,10 +201,11 @@ public class FtpPickerFragment extends AbstractFilePickerFragment<FtpFile> {
      * Get a loader that lists the files in the current path,
      * and monitors changes.
      */
+    @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
     public Loader<SortedList<FtpFile>> getLoader() {
-        return new AsyncTaskLoader<SortedList<FtpFile>>(getContext()) {
+        return new AsyncTaskLoader<SortedList<FtpFile>>(requireContext()) {
             @Override
             public SortedList<FtpFile> loadInBackground() {
                 SortedList<FtpFile> sortedList = new SortedList<>(FtpFile.class, new SortedListAdapterCallback<FtpFile>(getDummyAdapter()) {
@@ -320,6 +322,7 @@ public class FtpPickerFragment extends AbstractFilePickerFragment<FtpFile> {
      */
     @Override
     public void onNewFolder(@NonNull String name) {
+        @SuppressLint("StaticFieldLeak")
         AsyncTask<String, Void, FtpFile> task = new AsyncTask<String, Void, FtpFile>() {
 
             @Override
@@ -336,7 +339,7 @@ public class FtpPickerFragment extends AbstractFilePickerFragment<FtpFile> {
                 if (folder != null) {
                     refresh(folder);
                 } else {
-                    Toast.makeText(getContext(), R.string.nnf_create_folder_error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(), R.string.nnf_create_folder_error, Toast.LENGTH_SHORT).show();
                 }
             }
         };

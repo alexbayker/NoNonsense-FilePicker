@@ -8,14 +8,20 @@ plugins {
     id 'com.android.application'
 }
 
+ext {
+    moduleArtifactId = "sample"
+    moduleVersion = sampleModuleVersion
+}
+
+apply from: "../publisher.gradle"
+
 android {
-    compileSdk 28
-    buildToolsVersion "30.0.3"
+    compileSdk versionTargetSdk
 
     defaultConfig {
-        minSdk 21
-        targetSdk 28
-        versionCode gitCommitCount
+        minSdk versionMinSdk
+        targetSdk versionTargetSdk
+        versionCode commitCount
         versionName gitTag
 
         vectorDrawables.useSupportLibrary true
@@ -30,7 +36,7 @@ android {
         }
         uitests {
             dimension "sdk"
-            minSdk 18
+            minSdk versionMinSdk
         }
     }
 
@@ -64,29 +70,29 @@ dependencies {
     implementation project(':library')
 
     // AndroidX
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation "androidx.appcompat:appcompat:$versionAppCompat"
+    implementation "androidx.recyclerview:recyclerview:$versionRecyclerView"
 
     // Image loading sample
-    implementation 'com.github.bumptech.glide:glide:4.13.2'
+    implementation "com.github.bumptech.glide:glide:$versionGlide"
 
     // FTP browser sample
-    implementation 'commons-net:commons-net:3.8.0'
+    implementation "commons-net:commons-net:$versionCommonsNet"
 
     // Root example
-    implementation 'com.github.topjohnwu.libsu:core:5.0.2'
+    implementation "com.github.topjohnwu.libsu:core:$versionLibsuCore"
 
     // Fast scroll example
-    implementation 'com.simplecityapps:recyclerview-fastscroll:2.0.1'
+    implementation "com.simplecityapps:recyclerview-fastscroll:$versionFastScroll"
 
     // Dropbox example
-    implementation 'com.dropbox.core:dropbox-core-sdk:4.0.1'
+    implementation "com.dropbox.core:dropbox-core-sdk:$versionDropbox"
 
     // UI Tests
-    implementation 'junit:junit:4.13.2'
-    androidTestImplementation 'junit:junit:4.13.2'
-    uitestsImplementation 'androidx.test.espresso:espresso-contrib:3.4.0'
-    uitestsImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-    uitestsImplementation 'androidx.test.ext:junit:1.1.3'
-    uitestsImplementation 'androidx.test.uiautomator:uiautomator:2.2.0'
+    implementation "junit:junit:$versionJUnit"
+    androidTestImplementation "junit:junit:$versionJUnit"
+    uitestsImplementation "androidx.test.espresso:espresso-contrib:$versionTestEspresso"
+    uitestsImplementation "androidx.test.espresso:espresso-core:$versionTestEspresso"
+    uitestsImplementation "androidx.test.ext:junit:$versionJUnitExt"
+    uitestsImplementation "androidx.test.uiautomator:uiautomator:$versionUIAutomator"
 }

@@ -18,12 +18,13 @@ public class PermissionGranter {
     private static final int GRANT_BUTTON_INDEX = 1;
 
     public static void allowPermissionsIfNeeded(Activity activity) {
-        allowPermissionsIfNeeded(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        allowPermissionsIfNeeded(activity, new String[] { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE });
     }
 
-    public static void allowPermissionsIfNeeded(Activity activity, String permissionNeeded) {
+    public static void allowPermissionsIfNeeded(Activity activity, String[] permissionsNeeded) {
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasNeededPermission(activity, permissionNeeded)) {
+            if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) ||
+                    (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !hasNeededPermission(activity, permissionsNeeded))) {
                 sleep(PERMISSIONS_DIALOG_DELAY);
                 UiDevice device = UiDevice.getInstance(getInstrumentation());
                 UiObject allowPermissions = device.findObject(new UiSelector().clickable(true).index(GRANT_BUTTON_INDEX));
@@ -36,9 +37,14 @@ public class PermissionGranter {
         }
     }
 
-    private static boolean hasNeededPermission(Activity activity, String permissionNeeded) {
-        int permissionStatus = ContextCompat.checkSelfPermission(activity, permissionNeeded);
-        return permissionStatus == PackageManager.PERMISSION_GRANTED;
+    private static boolean hasNeededPermission(Activity activity, String[] permissionsNeeded) {
+        for (String permission : permissionsNeeded) {
+            int permissionStatus = ContextCompat.checkSelfPermission(activity, permission);
+            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static void sleep(long millis) {

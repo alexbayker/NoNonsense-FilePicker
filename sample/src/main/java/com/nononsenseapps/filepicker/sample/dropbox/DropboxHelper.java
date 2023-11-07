@@ -18,7 +18,7 @@ import com.dropbox.core.v2.DbxClientV2;
  * This class has some utility functions for dealing with Dropbox. You need to input your
  * API APP_KEY below, as well as in the com.dropbox.core.android.AuthActivity Activity
  * element of AndroidManifest.xml
- *
+ * <p>
  * Create an app and generate a key for it here:
  * https://www.dropbox.com/developers
  */

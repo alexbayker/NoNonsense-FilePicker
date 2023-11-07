@@ -44,7 +44,7 @@ public class DropboxFilePickerFragment extends AbstractFilePickerFragment<Metada
     public DropboxFilePickerFragment(final DbxClientV2 api) {
         super();
         if (api == null) {
-            throw new IllegalArgumentException("Must be authenticated with Dropbox");
+            throw new IllegalArgumentException(getString(R.string.must_be_auth_dropbox_error));
         }
 
         this.dropboxClient = api;
@@ -152,10 +152,11 @@ public class DropboxFilePickerFragment extends AbstractFilePickerFragment<Metada
         return new Uri.Builder().scheme("dropbox").authority("").path(file.getPathDisplay()).build();
     }
 
+    @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
     public Loader<SortedList<Metadata>> getLoader() {
-        return new AsyncTaskLoader<SortedList<Metadata>>(getActivity()) {
+        return new AsyncTaskLoader<SortedList<Metadata>>(requireActivity()) {
 
             @Override
             public SortedList<Metadata> loadInBackground() {
@@ -224,7 +225,7 @@ public class DropboxFilePickerFragment extends AbstractFilePickerFragment<Metada
 
                     files.endBatchedUpdates();
                 } catch (DbxException ignored) {
-                    Log.d(TAG, "Failed to list Dropbox folder", ignored);
+                    Log.d(TAG, getString(R.string.failed_to_list_dropbox), ignored);
                     ignored.getMessage();
                 }
 
@@ -290,7 +291,7 @@ public class DropboxFilePickerFragment extends AbstractFilePickerFragment<Metada
             } else {
                 progressBar.setVisibility(View.INVISIBLE);
                 recyclerView.setVisibility(View.VISIBLE);
-                Toast.makeText(getActivity(), R.string.nnf_create_folder_error,
+                Toast.makeText(requireActivity(), R.string.nnf_create_folder_error,
                         Toast.LENGTH_SHORT).show();
             }
         }

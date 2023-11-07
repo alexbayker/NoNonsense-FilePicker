@@ -10,7 +10,7 @@ public class FtpFile {
 
     public static final char separatorChar = '/';
     public static final String separator = "/";
-    private String path;
+    private final String path;
 
     public FtpFile(FtpFile dir, String name) {
         this(dir == null ? null : dir.getPath(), name);

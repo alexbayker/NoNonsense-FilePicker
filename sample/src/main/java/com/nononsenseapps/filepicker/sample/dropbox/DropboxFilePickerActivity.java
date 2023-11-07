@@ -14,15 +14,16 @@ import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.Metadata;
 import com.nononsenseapps.filepicker.AbstractFilePickerActivity;
 import com.nononsenseapps.filepicker.AbstractFilePickerFragment;
+import com.nononsenseapps.filepicker.sample.R;
 
 
 public class DropboxFilePickerActivity extends AbstractFilePickerActivity<Metadata> {
-    private DropboxHelper dropboxHelper = new DropboxHelper();
+    private final DropboxHelper dropboxHelper = new DropboxHelper();
 
     @Override
     protected void onResume() {
         if (dropboxHelper.authenticationFailed(this)) {
-            Toast.makeText(this, "Dropbox authentication failed", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.dropbox_auth_error), Toast.LENGTH_LONG).show();
             setResult(Activity.RESULT_CANCELED);
             finish();
         }

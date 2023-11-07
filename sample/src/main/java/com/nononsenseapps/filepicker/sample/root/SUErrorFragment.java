@@ -8,6 +8,8 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.appcompat.app.AlertDialog;
 
+import com.nononsenseapps.filepicker.sample.R;
+
 /**
  * A dialog which tells the user that no SU binary is available
  */
@@ -23,14 +25,8 @@ public class SUErrorFragment extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage("No read permisson, root unavailable")
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
+        builder.setMessage(requireActivity().getString(R.string.root_unavailable_error)).setPositiveButton(android.R.string.ok, (dialog, which) -> dialog.dismiss());
         return builder.create();
     }
 }

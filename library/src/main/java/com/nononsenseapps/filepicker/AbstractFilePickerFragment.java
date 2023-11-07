@@ -174,7 +174,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
         // do not change the size of the RecyclerView
         recyclerView.setHasFixedSize(true);
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(getActivity());
+        layoutManager = new LinearLayoutManager(requireActivity());
         recyclerView.setLayoutManager(layoutManager);
         // Set Item Decoration if exists
         configureItemDecoration(inflater, recyclerView);
@@ -246,7 +246,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
     protected void configureItemDecoration(@NonNull LayoutInflater inflater,
                                            @NonNull RecyclerView recyclerView) {
         final TypedArray attributes =
-                getActivity().obtainStyledAttributes(new int[]{R.attr.nnf_list_item_divider});
+                requireActivity().obtainStyledAttributes(new int[]{R.attr.nnf_list_item_divider});
         Drawable divider = attributes.getDrawable(0);
         attributes.recycle();
 
@@ -278,7 +278,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
 
         // Some invalid cases first
         /*if (MODE_NEW_FILE == mode && !isValidFileName(getNewFileName())) {
-            mToast = Toast.makeText(getActivity(), R.string.nnf_need_valid_filename,
+            mToast = Toast.makeText(requireActivity(), R.string.nnf_need_valid_filename,
                     Toast.LENGTH_SHORT);
             mToast.show();
             return;
@@ -286,7 +286,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
         if ((allowMultiple || mode == MODE_FILE) &&
                 (mCheckedItems.isEmpty() || getFirstCheckedItem() == null)) {
             if (mToast == null) {
-                mToast = Toast.makeText(getActivity(), R.string.nnf_select_something_first,
+                mToast = Toast.makeText(requireActivity(), R.string.nnf_select_something_first,
                         Toast.LENGTH_SHORT);
             }
             mToast.show();
@@ -339,7 +339,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
      * @param toolbar from layout with id "picker_toolbar"
      */
     protected void setupToolbar(@NonNull Toolbar toolbar) {
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
     }
 
     public
@@ -468,7 +468,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
         mRegularButtonContainer.setVisibility(nf ? View.GONE : View.VISIBLE);
 
         if (!nf && singleClick) {
-            getActivity().findViewById(R.id.nnf_button_ok).setVisibility(View.GONE);
+            requireActivity().findViewById(R.id.nnf_button_ok).setVisibility(View.GONE);
         }
     }
 
@@ -483,7 +483,7 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
     @Override
     public boolean onOptionsItemSelected(MenuItem menuItem) {
         if (R.id.nnf_action_createdir == menuItem.getItemId()) {
-            Activity activity = getActivity();
+            Activity activity = requireActivity();
             if (activity instanceof AppCompatActivity) {
                 NewFolderFragment.showDialog(((AppCompatActivity) activity).getSupportFragmentManager(),
                         AbstractFilePickerFragment.this);
@@ -630,16 +630,16 @@ public abstract class AbstractFilePickerFragment<T> extends Fragment
         View v;
         switch (viewType) {
             case LogicHandler.VIEWTYPE_HEADER:
-                v = LayoutInflater.from(getActivity()).inflate(R.layout.nnf_filepicker_listitem_dir,
+                v = LayoutInflater.from(requireActivity()).inflate(R.layout.nnf_filepicker_listitem_dir,
                         parent, false);
                 return new HeaderViewHolder(v);
             case LogicHandler.VIEWTYPE_CHECKABLE:
-                v = LayoutInflater.from(getActivity()).inflate(R.layout.nnf_filepicker_listitem_checkable,
+                v = LayoutInflater.from(requireActivity()).inflate(R.layout.nnf_filepicker_listitem_checkable,
                         parent, false);
                 return new CheckableViewHolder(v);
             case LogicHandler.VIEWTYPE_DIR:
             default:
-                v = LayoutInflater.from(getActivity()).inflate(R.layout.nnf_filepicker_listitem_dir,
+                v = LayoutInflater.from(requireActivity()).inflate(R.layout.nnf_filepicker_listitem_dir,
                         parent, false);
                 return new DirViewHolder(v);
         }

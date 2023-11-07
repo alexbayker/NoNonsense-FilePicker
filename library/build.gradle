@@ -8,14 +8,20 @@ plugins {
     id 'com.android.library'
 }
 
+ext {
+    moduleArtifactId = "library"
+    moduleVersion = libraryModuleVersion
+}
+
+apply from: "../publisher.gradle"
+
 android {
-    compileSdk 28
-    buildToolsVersion "30.0.3"
+    compileSdk versionTargetSdk
 
     defaultConfig {
-        minSdk 21
-        targetSdk 28
-        versionCode gitCommitCount
+        minSdk versionMinSdk
+        targetSdk versionTargetSdk
+        versionCode commitCount
         versionName gitTag
     }
 
@@ -38,8 +44,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation "androidx.appcompat:appcompat:$versionAppCompat"
+    implementation "androidx.recyclerview:recyclerview:$versionRecyclerView"
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation "junit:junit:$versionJUnit"
 }

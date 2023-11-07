@@ -101,10 +101,10 @@ public class MultimediaPickerFragment extends FilePickerFragment {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         switch (viewType) {
             case VIEWTYPE_IMAGE_CHECKABLE:
-                return new CheckableViewHolder(LayoutInflater.from(getActivity())
+                return new CheckableViewHolder(LayoutInflater.from(requireActivity())
                         .inflate(R.layout.listitem_image_checkable, parent, false));
             case VIEWTYPE_IMAGE:
-                return new DirViewHolder(LayoutInflater.from(getActivity())
+                return new DirViewHolder(LayoutInflater.from(requireActivity())
                         .inflate(R.layout.listitem_image, parent, false));
             default:
                 return super.onCreateViewHolder(parent, viewType);

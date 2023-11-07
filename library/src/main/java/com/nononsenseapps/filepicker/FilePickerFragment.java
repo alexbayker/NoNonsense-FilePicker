@@ -7,11 +7,13 @@
 package com.nononsenseapps.filepicker;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.FileObserver;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission;
 import androidx.annotation.NonNull;
 import androidx.loader.content.AsyncTaskLoader;
 import androidx.core.content.ContextCompat;
@@ -19,6 +21,8 @@ import androidx.core.content.FileProvider;
 import androidx.loader.content.Loader;
 import androidx.recyclerview.widget.SortedList;
 import androidx.recyclerview.widget.SortedListAdapterCallback;
+
+import android.provider.Settings;
 import android.widget.Toast;
 
 import java.io.File;
@@ -28,6 +32,8 @@ import java.io.File;
  * storage (SD-card) on a device.
  */
 public class FilePickerFragment extends AbstractFilePickerFragment<File> {
+
+    public static final int REQUEST_PERMISSION_EXTERNAL_STORAGE = 3;
 
     protected boolean showHiddenItems = false;
     private File mRequestedPath = null;
@@ -59,9 +65,9 @@ public class FilePickerFragment extends AbstractFilePickerFragment<File> {
      */
     @Override
     protected boolean hasPermission(@NonNull File path) {
-        return PackageManager.PERMISSION_GRANTED ==
-                ContextCompat.checkSelfPermission(getContext(),
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        return ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) ||
+                (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)  == PackageManager.PERMISSION_GRANTED &&
+                 ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED));
     }
 
     /**
@@ -76,29 +82,36 @@ public class FilePickerFragment extends AbstractFilePickerFragment<File> {
 //        }
 
         mRequestedPath = path;
-        requestPermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                            Uri.parse("package:" + BuildConfig.LIBRARY_PACKAGE_NAME));
+                    startActivityForResult(intent, REQUEST_PERMISSION_EXTERNAL_STORAGE);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                    startActivityForResult(intent, REQUEST_PERMISSION_EXTERNAL_STORAGE);
+                }
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE }, REQUEST_PERMISSION_EXTERNAL_STORAGE);
+        }
     }
 
-    /**
-     * This is the object that will be launched when permission is granted/denied. By default,
-     * a granted request will result in a refresh of the list.
-     */
-    private final ActivityResultLauncher<String> requestPermissionLauncher =
-            registerForActivityResult(new RequestPermission(), isGranted -> {
-                if (isGranted) {
-                    // Do refresh
-                    if (mRequestedPath != null) {
-                        refresh(mRequestedPath);
-                    }
-                } else {
-                    Toast.makeText(getContext(), R.string.nnf_permission_external_write_denied,
-                            Toast.LENGTH_SHORT).show();
-                    // Treat this as a cancel press
-                    if (mListener != null) {
-                        mListener.onCancelled();
-                    }
-                }
-            });
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (!hasPermission(mRequestedPath)) {
+            return;
+        }
+
+        switch (requestCode) {
+            case REQUEST_PERMISSION_EXTERNAL_STORAGE: {
+                break;
+            }
+        }
+    }
 
     /**
      * Return true if the path is a directory and not a file.
@@ -183,20 +196,22 @@ public class FilePickerFragment extends AbstractFilePickerFragment<File> {
     @NonNull
     @Override
     public Uri toUri(@NonNull final File file) {
-        return FileProvider
-                .getUriForFile(getContext(),
-                        getContext().getApplicationContext().getPackageName() + ".provider",
-                        file);
+        return Utils.parseContentProviderUriFromFile(file);
+        /*return FileProvider
+                .getUriForFile(requireContext(),
+                        requireContext().getApplicationContext().getPackageName() + ".provider",
+                        file);*/
     }
 
     /**
      * Get a loader that lists the Files in the current path,
      * and monitors changes.
      */
+    @SuppressLint("StaticFieldLeak")
     @NonNull
     @Override
     public Loader<SortedList<File>> getLoader() {
-        return new AsyncTaskLoader<SortedList<File>>(getActivity()) {
+        return new AsyncTaskLoader<SortedList<File>>(requireActivity()) {
 
             FileObserver fileObserver;
 
@@ -295,7 +310,7 @@ public class FilePickerFragment extends AbstractFilePickerFragment<File> {
         if (folder.mkdir()) {
             refresh(folder);
         } else {
-            Toast.makeText(getActivity(), R.string.nnf_create_folder_error,
+            Toast.makeText(requireActivity(), R.string.nnf_create_folder_error,
                     Toast.LENGTH_SHORT).show();
         }
     }
