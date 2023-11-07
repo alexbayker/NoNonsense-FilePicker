@@ -1,0 +1,46 @@
+apply plugin: 'maven-publish'
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username System.getenv("GITHUBUSER")
+                password System.getenv("GITHUBPASS")
+            }
+            allowInsecureProtocol = true
+            url libraryVersion.endsWith("SNAPSHOT") ? repositorySnapshotUrl : repositoryUrl
+        }
+    }
+
+    publications {
+        AndroidLibrary(MavenPublication) {
+            groupId libraryGroupId
+            artifactId project.moduleArtifactId
+            version project.moduleVersion
+
+            artifact "$buildDir/outputs/aar/${project.getName()}-release.aar"
+
+            pom {
+                // Add first level dependencies to publication
+                withXml {
+                    def dependencies = asNode().appendNode("dependencies")
+                    configurations.getByName("releaseCompileClasspath")
+                            .getResolvedConfiguration()
+                            .getFirstLevelModuleDependencies()
+                            .each {
+                        def dependency = dependencies.appendNode("dependency")
+                        dependency.appendNode("groupId", it.moduleGroup)
+                        dependency.appendNode("artifactId", it.moduleName)
+                        dependency.appendNode("version", it.moduleVersion)
+                    }
+                }
+            }
+        }
+    }
+
+    model {
+        tasks.publishAndroidLibraryPublicationToMavenRepository {
+            dependsOn project.tasks.assembleRelease
+        }
+    }
+}
