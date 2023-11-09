@@ -5,7 +5,7 @@ publishing {
         maven {
             credentials {
                 username System.getenv("GITHUBUSER")
-                password System.getenv("GITHUBPASS")
+                password System.getenv("GITHUBTOKEN")
             }
             allowInsecureProtocol = true
             url libraryVersion.endsWith("SNAPSHOT") ? repositorySnapshotUrl : repositoryUrl

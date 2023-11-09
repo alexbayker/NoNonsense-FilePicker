@@ -64,7 +64,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.TeamNewPipe:NoNonsense-FilePicker:x.y.z'
+    implementation 'com.github.alexbayker:NoNonsense-FilePicker:5.0.3'
 }
 ```
 
